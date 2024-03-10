@@ -108,6 +108,31 @@ window.fetch = (target, ...args) => {
         return window._fetch(url, ...args);
     }
 }
+/* XML-HTTP-REQUEST */
+window._XMLHttpRequest = window.XMLHttpRequest;
+window.XMLHttpRequest = function() {
+    const xhr = new window._XMLHttpRequest();
+
+    const proxyHostname = new URL(window.location.href).origin;
+    const proxyTarget = new URL(window.location.href).pathname.replace(/\\//, "");
+    this._open = xhr.open;
+
+    xhr.open = function(method, url, ...args) {
+        if (url instanceof URL) {
+            url = url.toString()
+        }
+        let newUrl = "";
+        if (url.startsWith("http") || url.startsWith("//")) {
+            newUrl = proxyHostname + "/" + url;
+        } else {
+            newUrl = proxyHostname + "/" + proxyTarget + "/" + url.replace(/^\\.*\\//, "");
+        }
+        console.log(newUrl)
+        return this._open(method, newUrl, ...args);
+    };
+
+    return this;
+}
 /* OBSERVER */
 const url = new URL(window.location.href);
 const proxyURL = url.origin;
