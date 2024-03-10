@@ -24,7 +24,8 @@ async function modifyHTMLContent(content: string, baseURL: string, proxyURL: str
 
     aTags.forEach((a) => {
         const href = a.getAttribute("href");
-        if (href && !href.startsWith("http")) {
+        if (!href) return;
+        if (!href.startsWith("http")) {
             const absoluteURL = convertRelativeToAbsolute(baseURL, href);
             a.setAttribute("href", proxyURL + "/" + absoluteURL);
         }else if (href.startsWith("http") || href.startsWith("//")) {
@@ -36,7 +37,8 @@ async function modifyHTMLContent(content: string, baseURL: string, proxyURL: str
 
     srcHrefs.forEach((tag) => {
         const href = tag.getAttribute("src");
-        if (href && !href.startsWith("http")) {
+        if (!href) return;
+        if (!href.startsWith("http")) {
             const absoluteURL = convertRelativeToAbsolute(baseURL, href);
             tag.setAttribute("src", proxyURL + "/" + absoluteURL);
         }else if (href.startsWith("http") || href.startsWith("//")) {
@@ -48,7 +50,8 @@ async function modifyHTMLContent(content: string, baseURL: string, proxyURL: str
 
     actionHrefs.forEach((tag) => {
         const href = tag.getAttribute("action");
-        if (href && !href.startsWith("http")) {
+        if (!href) return;
+        if (!href.startsWith("http")) {
             const absoluteURL = convertRelativeToAbsolute(baseURL, href);
             tag.setAttribute("action", proxyURL + "/" + absoluteURL);
         }else if (href.startsWith("http") || href.startsWith("//")) {
@@ -151,8 +154,9 @@ const observer = new MutationObserver((mutationsList, observer) => {
 
           aTags.forEach((a) => {
             const href = a.getAttribute("href");
+            if (!href) return;
             if (href.includes(window.location.hostname)) return;
-            if (href && !href.startsWith("http") && !href.startsWith("//")) {
+            if (!href.startsWith("http") && !href.startsWith("//")) {
               const absoluteURL = normalizeURL(href);
               a.setAttribute("href", proxyURL + "/" + absoluteURL);
             } else if (href.startsWith("http") || href.startsWith("//")) {
@@ -164,8 +168,9 @@ const observer = new MutationObserver((mutationsList, observer) => {
 
           srcHrefs.forEach((tag) => {
             const href = tag.getAttribute("src");
+            if (!href) return;
             if (href.includes(window.location.hostname)) return;
-            if (href && !href.startsWith("http") && !href.startsWith("//")) {
+            if (!href.startsWith("http") && !href.startsWith("//")) {
               const absoluteURL = normalizeURL(href);
               tag.setAttribute("src", proxyURL + "/" + absoluteURL);
             } else if (href.startsWith("http") || href.startsWith("//")) {
@@ -177,8 +182,9 @@ const observer = new MutationObserver((mutationsList, observer) => {
 
           actionHrefs.forEach((tag) => {
             const href = tag.getAttribute("action");
+            if (!href) return;
             if (href.includes(window.location.hostname)) return;
-            if (href && !href.startsWith("http") && !href.startsWith("//")) {
+            if (!href.startsWith("http") && !href.startsWith("//")) {
               const absoluteURL = normalizeURL(href);
               tag.setAttribute("action", proxyURL + "/" + absoluteURL);
             } else if (href.startsWith("http") || href.startsWith("//")) {
