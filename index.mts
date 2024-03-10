@@ -127,7 +127,6 @@ window.XMLHttpRequest = function() {
         } else {
             newUrl = proxyHostname + "/" + proxyTarget + "/" + url.replace(/^\\.*\\//, "");
         }
-        console.log(newUrl)
         return this._open(method, newUrl, ...args);
     };
 
@@ -195,23 +194,10 @@ const observer = new MutationObserver((mutationsList, observer) => {
 });
 
 observer.observe(document.body, { childList: true, attributes: true, subtree: true });
-/* LOCATION */
-window.location.__defineSetter__("_href", (target) => {
-    const proxyHostname = new URL(window.location.href).origin;
-    const proxyTarget = new URL(window.location.href).pathname.replace(/\\//, "");
-    if (target.startsWith("http") || target.startsWith("//")) {
-        const url = proxyHostname + "/" + target;
-        return window._open(url, "_self");
-    }else {
-        const url = proxyHostname + "/" + proxyTarget + "/" + target.replace(/^\\.*\\//, "");
-        return window._open(url, "_self");
-    }
-})
-window.location.__defineGetter__("_href", (target) => window.location.href)
 </script>
 <!-- DENO-X-PROXY -->
 `;
-    const modifiedContentWithScript = dom.documentElement.outerHTML.replace(/location\.href/g, "location._href").replace("</body>", `${scriptTag}</body>`);
+    const modifiedContentWithScript = dom.documentElement.outerHTML.replace("</body>", `${scriptTag}</body>`);
     
     return modifiedContentWithScript;
 }
@@ -260,16 +246,6 @@ Deno.serve(async (req: Request) => {
     if (res.headers.get("content-type")?.includes("text/html")) {
         const content = await res.text();
         const modifiedContent = await modifyHTMLContent(content, target, "//" + url.hostname);
-        res = new Response(modifiedContent, {
-            ...res,        
-            status: res.status,
-            headers: res.headers,
-        });
-    }
-
-    if (res.headers.get("content-type")?.includes("text/javascript") || res.headers.get("content-type")?.includes("application/javascript")) {
-        const content = await res.text();
-        const modifiedContent = content.replace(/location\.href/g, "location._href");
         res = new Response(modifiedContent, {
             ...res,        
             status: res.status,
